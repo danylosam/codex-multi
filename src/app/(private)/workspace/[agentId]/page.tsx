@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, Send, FileText, Target, PlayCircle, Bot } from 'lucide-react'
+import { toast } from 'sonner'
+import { sendAgentMessage } from './actions'
 
 export default function AgentWorkspacePage() {
   const params = useParams()
@@ -21,20 +23,32 @@ export default function AgentWorkspacePage() {
     },
   ])
   const [inputValue, setInputValue] = useState('')
+  const [isPending, setIsPending] = useState(false)
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!inputValue.trim()) return
+    const content = inputValue.trim()
+    if (!content || isPending) return
 
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', content: inputValue },
-      {
-        role: 'assistant',
-        content: 'Entendido. Estou analisando seu briefing para compor a estratégia e os ganchos de conversão...',
-      },
-    ])
+    const conversation = [...messages, { role: 'user' as const, content }]
+    setMessages(conversation)
     setInputValue('')
+    setIsPending(true)
+
+    try {
+      const result = await sendAgentMessage(agentSlug, conversation)
+      if ('error' in result) {
+        toast.error('Não foi possível responder', { description: result.error })
+      } else {
+        setMessages([...conversation, { role: 'assistant', content: result.reply }])
+      }
+    } catch {
+      toast.error('Falha de conexão', {
+        description: 'Tente enviar sua mensagem novamente em instantes.',
+      })
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -140,6 +154,13 @@ export default function AgentWorkspacePage() {
                 </div>
               </motion.div>
             ))}
+            {isPending && (
+              <div className="flex justify-start text-sm" role="status" aria-live="polite">
+                <div className="rounded-lg border border-zinc-800/80 bg-zinc-900 px-4 py-3 text-zinc-400">
+                  Sherpa está preparando uma resposta...
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
 
@@ -149,9 +170,10 @@ export default function AgentWorkspacePage() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Envie uma dúvida ou instrução para seu especialista..."
+              disabled={isPending}
               className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-zinc-700"
             />
-            <Button type="submit" size="icon" className="bg-zinc-100 text-zinc-900 hover:bg-zinc-300 shrink-0">
+            <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()} className="bg-zinc-100 text-zinc-900 hover:bg-zinc-300 shrink-0">
               <Send className="h-4 w-4" />
             </Button>
           </form>
