@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import OpenAI from 'openai'
+import { GoogleGenAI } from '@google/genai'
 
 export type SherpaMessage = {
   role: 'user' | 'assistant'
@@ -7,12 +7,12 @@ export type SherpaMessage = {
 }
 
 export type SherpaReply =
-  | { reply: string; provider: 'openrouter' | 'anthropic' }
+  | { reply: string; provider: 'gemini' | 'anthropic' }
   | { error: string }
 
-const OPENROUTER_MODEL = 'google/gemma-4-26b-a4b-it:free'
+const GEMINI_MODEL = 'gemini-3.8-flash'
 const ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001'
-const OPENROUTER_TIMEOUT_MS = 5_000
+const GEMINI_TIMEOUT_MS = 9_000
 
 const sherpaInstructions: Record<string, string> = {
   'vsl-writer':
@@ -36,40 +36,43 @@ export async function generateSherpaReply(
   }))
 
   try {
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error('OPENROUTER_API_KEY não configurada')
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error('GEMINI_API_KEY não configurada')
     }
 
-    const openRouter = new OpenAI({
-      apiKey: process.env.OPENROUTER_API_KEY,
-      baseURL: 'https://openrouter.ai/api/v1',
-      maxRetries: 0,
-    })
+    const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), OPENROUTER_TIMEOUT_MS)
+    const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS)
 
     try {
-      const completion = await openRouter.chat.completions.create(
-        {
-          model: OPENROUTER_MODEL,
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      const response = await gemini.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: messages.map(({ role, content }) => ({
+          role: role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: content }],
+        })),
+        config: {
+          systemInstruction: systemPrompt,
+          abortSignal: controller.signal,
+          maxOutputTokens: 1_024,
         },
-        { signal: controller.signal },
-      )
-      const reply = completion.choices[0]?.message?.content
-      if (typeof reply !== 'string' || !reply.trim()) {
-        throw new Error('OpenRouter retornou uma resposta vazia')
-      }
+      })
+      const reply = response.text?.trim()
+      if (!reply) throw new Error('Gemini retornou uma resposta vazia')
 
-      return { reply: reply.trim(), provider: 'openrouter' }
+      return { reply, provider: 'gemini' }
     } finally {
       clearTimeout(timeout)
     }
-  } catch (openRouterError) {
+  } catch (geminiError) {
+    console.warn(
+      'Gemini falhou; acionando o fallback Anthropic.',
+      geminiError instanceof Error ? geminiError.message : geminiError,
+    )
+
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.error('OpenRouter falhou e ANTHROPIC_API_KEY não está configurada', openRouterError)
       return {
-        error: 'Não foi possível gerar uma resposta. Verifique as chaves OPENROUTER_API_KEY e ANTHROPIC_API_KEY no ambiente do servidor.',
+        error: 'Não foi possível gerar uma resposta. Verifique as chaves GEMINI_API_KEY e ANTHROPIC_API_KEY no ambiente do servidor.',
       }
     }
 
@@ -93,8 +96,8 @@ export async function generateSherpaReply(
       if (!reply) throw new Error('Anthropic retornou uma resposta vazia')
       return { reply, provider: 'anthropic' }
     } catch (anthropicError) {
-      console.error('Falha nos provedores OpenRouter e Anthropic', {
-        openRouterError,
+      console.error('Falha nos provedores Gemini e Anthropic', {
+        geminiError,
         anthropicError,
       })
       return {
