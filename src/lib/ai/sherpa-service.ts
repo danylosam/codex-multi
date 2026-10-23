@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { GoogleGenAI } from '@google/genai'
 
 export type SherpaMessage = {
@@ -7,12 +6,13 @@ export type SherpaMessage = {
 }
 
 export type SherpaReply =
-  | { reply: string; provider: 'gemini' | 'anthropic' }
+  | { reply: string; provider: 'gemini' | 'openrouter' }
   | { error: string }
 
-const GEMINI_MODEL = 'gemini-3.8-flash'
-const ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001'
-const GEMINI_TIMEOUT_MS = 9_000
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3-flash-preview'] as const
+const OPENROUTER_MODEL = 'google/gemma-4-31b-it:free'
+const GEMINI_TIMEOUT_MS = 8_000
+const OPENROUTER_TIMEOUT_MS = 10_000
 
 const sherpaInstructions: Record<string, string> = {
   'vsl-writer':
@@ -21,6 +21,10 @@ const sherpaInstructions: Record<string, string> = {
     'Você é o Sherpa Arquiteto de Funil. Ajude o usuário a estruturar oferta, etapas do funil, público e pontos de conversão. Faça uma pergunta de cada vez quando faltarem informações e explique as decisões. Responda em português.',
   'traffic-analyst':
     'Você é o Sherpa Gestor de Tráfego. Ajude o usuário a planejar campanhas, públicos, criativos e métricas de tráfego pago. Seja prático, peça contexto quando necessário e explique suas recomendações. Responda em português.',
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
 }
 
 export async function generateSherpaReply(
@@ -35,74 +39,124 @@ export async function generateSherpaReply(
     content: content.slice(0, 4_000),
   }))
 
+  let geminiErrorMessage = ''
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY não configurada')
+    if (!geminiKey) {
+      throw new Error('GEMINI_API_KEY ou GOOGLE_API_KEY não configurada')
     }
 
-    const gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+    const gemini = new GoogleGenAI({ apiKey: geminiKey })
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS)
+    const timeout = setTimeout(
+      () => controller.abort(new Error('Timeout do Gemini após 8 segundos')),
+      GEMINI_TIMEOUT_MS,
+    )
+    const modelErrors: string[] = []
 
     try {
-      const response = await gemini.models.generateContent({
-        model: GEMINI_MODEL,
-        contents: messages.map(({ role, content }) => ({
-          role: role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: content }],
-        })),
-        config: {
-          systemInstruction: systemPrompt,
-          abortSignal: controller.signal,
-          maxOutputTokens: 1_024,
-        },
-      })
-      const reply = response.text?.trim()
-      if (!reply) throw new Error('Gemini retornou uma resposta vazia')
+      for (const model of GEMINI_MODELS) {
+        try {
+          const response = await gemini.models.generateContent({
+            model,
+            contents: messages.map(({ role, content }) => ({
+              role: role === 'assistant' ? 'model' : 'user',
+              parts: [{ text: content }],
+            })),
+            config: {
+              systemInstruction: systemPrompt,
+              abortSignal: controller.signal,
+              maxOutputTokens: 1_024,
+            },
+          })
+          const reply = response.text?.trim()
+          if (!reply) throw new Error('Gemini retornou uma resposta vazia')
 
-      return { reply, provider: 'gemini' }
+          return { reply, provider: 'gemini' }
+        } catch (error) {
+          if (controller.signal.aborted) {
+            throw new Error('Timeout do Gemini após 8 segundos')
+          }
+          modelErrors.push(`[${model}]: ${getErrorMessage(error)}`)
+        }
+      }
+
+      throw new Error(modelErrors.join(' | '))
     } finally {
       clearTimeout(timeout)
     }
-  } catch (geminiError) {
-    console.warn(
-      'Gemini falhou; acionando o fallback Anthropic.',
-      geminiError instanceof Error ? geminiError.message : geminiError,
+  } catch (error) {
+    geminiErrorMessage = getErrorMessage(error)
+    console.warn('Gemini falhou; acionando o fallback OpenRouter.', geminiErrorMessage)
+  }
+
+  let openRouterErrorMessage = ''
+  try {
+    const openRouterKey = process.env.OPENROUTER_API_KEY
+    if (!openRouterKey) throw new Error('OPENROUTER_API_KEY não configurada')
+
+    const controller = new AbortController()
+    const timeout = setTimeout(
+      () => controller.abort(new Error('Timeout do OpenRouter após 10 segundos')),
+      OPENROUTER_TIMEOUT_MS,
     )
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return {
-        error: 'Não foi possível gerar uma resposta. Verifique as chaves GEMINI_API_KEY e ANTHROPIC_API_KEY no ambiente do servidor.',
-      }
-    }
-
     try {
-      const anthropic = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-        maxRetries: 0,
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${openRouterKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages,
+          ],
+        }),
+        signal: controller.signal,
       })
-      const response = await anthropic.messages.create({
-        model: ANTHROPIC_MODEL,
-        max_tokens: 1_024,
-        system: systemPrompt,
-        messages,
-      })
-      const reply = response.content
-        .filter((block) => block.type === 'text')
-        .map((block) => block.text)
-        .join('\n')
-        .trim()
 
-      if (!reply) throw new Error('Anthropic retornou uma resposta vazia')
-      return { reply, provider: 'anthropic' }
-    } catch (anthropicError) {
-      console.error('Falha nos provedores Gemini e Anthropic', {
-        geminiError,
-        anthropicError,
-      })
-      return {
-        error: 'Os provedores de IA estão indisponíveis no momento. Tente novamente em instantes.',
+      const responseBody = await response.text()
+      let payload: {
+        choices?: Array<{ message?: { content?: unknown } }>
+        error?: { message?: string }
       }
+
+      try {
+        payload = JSON.parse(responseBody)
+      } catch {
+        throw new Error(
+          `OpenRouter retornou HTTP ${response.status}: ${responseBody || response.statusText}`,
+        )
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `OpenRouter retornou HTTP ${response.status}: ${payload.error?.message || response.statusText}`,
+        )
+      }
+
+      const reply = payload.choices?.[0]?.message?.content
+      if (typeof reply !== 'string' || !reply.trim()) {
+        throw new Error('OpenRouter retornou uma resposta vazia')
+      }
+
+      return { reply: reply.trim(), provider: 'openrouter' }
+    } catch (error) {
+      openRouterErrorMessage = controller.signal.aborted
+        ? 'Timeout do OpenRouter após 10 segundos'
+        : getErrorMessage(error)
+    } finally {
+      clearTimeout(timeout)
     }
+  } catch (error) {
+    openRouterErrorMessage = getErrorMessage(error)
   }
+
+  const error = `[Gemini]: ${geminiErrorMessage} | [OpenRouter]: ${openRouterErrorMessage}`
+  console.error('Todos os provedores gratuitos falharam.', error)
+  return { error }
 }
