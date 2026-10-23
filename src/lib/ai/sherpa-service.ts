@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai'
+import { getSystemPrompt } from './prompts'
 
 export type SherpaMessage = {
   role: 'user' | 'assistant'
@@ -14,15 +15,6 @@ const OPENROUTER_MODEL = 'google/gemma-4-31b-it:free'
 const GEMINI_TIMEOUT_MS = 8_000
 const OPENROUTER_TIMEOUT_MS = 10_000
 
-const sherpaInstructions: Record<string, string> = {
-  'vsl-writer':
-    'Você é o Sherpa de Copywriter VSL. Conduza o usuário na construção de uma VSL clara e persuasiva, fazendo perguntas úteis e explicando brevemente o raciocínio por trás das recomendações. Responda em português.',
-  'funnel-architect':
-    'Você é o Sherpa Arquiteto de Funil. Ajude o usuário a estruturar oferta, etapas do funil, público e pontos de conversão. Faça uma pergunta de cada vez quando faltarem informações e explique as decisões. Responda em português.',
-  'traffic-analyst':
-    'Você é o Sherpa Gestor de Tráfego. Ajude o usuário a planejar campanhas, públicos, criativos e métricas de tráfego pago. Seja prático, peça contexto quando necessário e explique suas recomendações. Responda em português.',
-}
-
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error)
 }
@@ -31,7 +23,7 @@ export async function generateSherpaReply(
   agentId: string,
   conversation: SherpaMessage[],
 ): Promise<SherpaReply> {
-  const systemPrompt = sherpaInstructions[agentId]
+  const systemPrompt = getSystemPrompt(agentId)
   if (!systemPrompt) return { error: 'Especialista não encontrado.' }
 
   const messages = conversation.slice(-12).map(({ role, content }) => ({
