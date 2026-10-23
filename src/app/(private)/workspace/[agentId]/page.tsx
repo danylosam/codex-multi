@@ -1,12 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, Send, FileText, Target, PlayCircle, Bot } from 'lucide-react'
 import { toast } from 'sonner'
@@ -24,6 +23,13 @@ export default function AgentWorkspacePage() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isPending, setIsPending] = useState(false)
+
+  useEffect(() => {
+    const briefing = window.sessionStorage.getItem('sherpa-mission-briefing')
+    if (!briefing) return
+    window.sessionStorage.removeItem('sherpa-mission-briefing')
+    setInputValue(briefing)
+  }, [])
 
   const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -166,12 +172,13 @@ export default function AgentWorkspacePage() {
 
         <div className="p-4 border-t border-zinc-800/80 bg-zinc-950">
           <form onSubmit={handleSendMessage} className="max-w-2xl mx-auto flex gap-2">
-            <Input
+            <textarea
+              rows={2}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Envie uma dúvida ou instrução para seu especialista..."
               disabled={isPending}
-              className="bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-zinc-700"
+              className="min-h-10 flex-1 resize-y rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-700 disabled:opacity-50"
             />
             <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()} className="bg-zinc-100 text-zinc-900 hover:bg-zinc-300 shrink-0">
               <Send className="h-4 w-4" />
