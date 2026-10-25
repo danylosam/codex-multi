@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
-          <Toaster theme="system" />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

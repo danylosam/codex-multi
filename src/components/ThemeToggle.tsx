@@ -24,7 +24,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="size-9 rounded-xl text-muted-foreground"
     >
-      {isDark ? <Sun data-icon="inline-start" /> : <Moon data-icon="inline-start" />}
+      {mounted ? (isDark ? <Sun data-icon="inline-start" /> : <Moon data-icon="inline-start" />) : <span aria-hidden="true" className="size-4" />}
       <span className="sr-only">Alternar tema</span>
     </Button>
   )
