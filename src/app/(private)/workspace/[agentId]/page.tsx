@@ -58,62 +58,62 @@ export default function AgentWorkspacePage() {
   }
 
   return (
-    <div className="flex h-full flex-col lg:flex-row overflow-hidden bg-zinc-950 font-sans">
+    <div className="flex h-full flex-col overflow-hidden bg-background font-sans text-foreground lg:flex-row">
       {/* Painel Esquerdo: Canvas do Projeto / Briefing */}
-      <section className="flex-1 border-b lg:border-b-0 lg:border-r border-zinc-800/80 flex flex-col min-w-0 bg-zinc-900/20">
-        <header className="h-14 border-b border-zinc-800/80 px-6 flex items-center justify-between">
+      <section className="flex min-w-0 flex-1 flex-col border-b border-border bg-background lg:border-r lg:border-b-0">
+        <header className="flex h-14 items-center justify-between border-b border-border px-6">
           <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-zinc-400" />
-            <span className="text-sm font-semibold text-zinc-200">Projeto: Estrutura de VSL & Funil</span>
+            <FileText className="size-4 text-muted-foreground" />
+            <span className="text-sm font-semibold">Projeto: Estrutura de VSL & Funil</span>
           </div>
-          <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/10 text-xs">
+          <Badge variant="outline" className="text-xs">
             Em Execução
           </Badge>
         </header>
 
         <div className="flex-1 p-6 overflow-hidden">
           <Tabs defaultValue="briefing" className="h-full flex flex-col">
-            <TabsList className="bg-zinc-900 border border-zinc-800 self-start mb-4">
-              <TabsTrigger value="briefing" className="text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+            <TabsList className="mb-4 self-start border border-border bg-muted">
+              <TabsTrigger value="briefing" className="text-xs data-[state=active]:bg-card data-[state=active]:text-foreground">
                 Briefing & Persona
               </TabsTrigger>
-              <TabsTrigger value="canvas" className="text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+              <TabsTrigger value="canvas" className="text-xs data-[state=active]:bg-card data-[state=active]:text-foreground">
                 Rascunho de Execução
               </TabsTrigger>
-              <TabsTrigger value="deliverables" className="text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+              <TabsTrigger value="deliverables" className="text-xs data-[state=active]:bg-card data-[state=active]:text-foreground">
                 Entregáveis Finais
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="briefing" className="flex-1 bg-zinc-900/40 border border-zinc-800/80 rounded-lg p-5 overflow-y-auto">
-              <div className="space-y-4 text-sm text-zinc-300">
+            <TabsContent value="briefing" className="flex-1 overflow-y-auto rounded-xl border border-border bg-card p-5 text-sm text-foreground">
+              <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-zinc-100 flex items-center gap-2 mb-1">
-                    <Target className="h-4 w-4 text-zinc-400" /> Público-Alvo & Dores
+                  <h4 className="mb-1 flex items-center gap-2 font-semibold">
+                    <Target className="size-4 text-muted-foreground" /> Público-Alvo & Dores
                   </h4>
-                  <p className="text-zinc-400 leading-relaxed">
+                  <p className="leading-relaxed text-muted-foreground">
                     Defina o nicho, o valor do ticket e a principal barreira de conversão da campanha antes de disparar o prompt para o agente.
                   </p>
                 </div>
-                <div className="border-t border-zinc-800/60 pt-4">
-                  <h4 className="font-semibold text-zinc-100 flex items-center gap-2 mb-1">
-                    <PlayCircle className="h-4 w-4 text-zinc-400" /> Promessa Central
+                <div className="border-t border-border pt-4">
+                  <h4 className="mb-1 flex items-center gap-2 font-semibold">
+                    <PlayCircle className="size-4 text-muted-foreground" /> Promessa Central
                   </h4>
-                  <p className="text-zinc-400 leading-relaxed">
+                  <p className="leading-relaxed text-muted-foreground">
                     A Big Idea orientará a retenção nos primeiros 5 segundos de criativo ou vídeo de vendas.
                   </p>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="canvas" className="flex-1 bg-zinc-900/40 border border-zinc-800/80 rounded-lg p-5">
+            <TabsContent value="canvas" className="flex-1 rounded-xl border border-border bg-card p-5">
               <textarea
                 placeholder="Edite aqui o resultado gerado pela IA ou escreva sua estrutura..."
-                className="w-full h-full bg-transparent resize-none border-none outline-none text-zinc-200 placeholder:text-zinc-600 text-sm leading-relaxed"
+                className="h-full w-full resize-none border-none bg-transparent text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
               />
             </TabsContent>
 
-            <TabsContent value="deliverables" className="flex-1 bg-zinc-900/40 border border-zinc-800/80 rounded-lg p-5 text-zinc-400 text-sm">
+            <TabsContent value="deliverables" className="flex-1 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
               Nenhum ativo final consolidado. Complete a interação com o agente para exportar copys ou estruturas.
             </TabsContent>
           </Tabs>
@@ -121,20 +121,20 @@ export default function AgentWorkspacePage() {
       </section>
 
       {/* Painel Direito: Especialista de IA (Co-learning) */}
-      <section className="flex-1 flex flex-col min-w-0 bg-zinc-950">
-        <header className="h-14 border-b border-zinc-800/80 px-6 flex items-center justify-between">
+      <section className="flex min-w-0 flex-1 flex-col bg-background">
+        <header className="flex h-14 items-center justify-between border-b border-border px-6">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center">
-              <Bot className="h-4 w-4 text-zinc-200" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-muted">
+              <Bot className="size-4" />
             </div>
             <div>
-              <span className="text-sm font-semibold text-zinc-100 capitalize">
+              <span className="text-sm font-semibold capitalize">
                 {agentSlug ? agentSlug.replace('-', ' ') : 'Especialista'}
               </span>
-              <span className="text-xs text-zinc-500 block">Co-Learning Ativo</span>
+              <span className="block text-xs text-muted-foreground">Co-Learning Ativo</span>
             </div>
           </div>
-          <Badge variant="outline" className="border-zinc-800 text-zinc-400 text-xs">
+          <Badge variant="outline" className="text-xs text-muted-foreground">
             Turbo Engine
           </Badge>
         </header>
@@ -152,8 +152,8 @@ export default function AgentWorkspacePage() {
                 <div
                   className={`rounded-lg px-4 py-3 max-w-[85%] leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-zinc-100 text-zinc-950'
-                      : 'bg-zinc-900 border border-zinc-800/80 text-zinc-200'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'border border-border bg-card text-card-foreground'
                   }`}
                 >
                   {msg.content}
@@ -162,7 +162,7 @@ export default function AgentWorkspacePage() {
             ))}
             {isPending && (
               <div className="flex justify-start text-sm" role="status" aria-live="polite">
-                <div className="rounded-lg border border-zinc-800/80 bg-zinc-900 px-4 py-3 text-zinc-400">
+                <div className="rounded-lg border border-border bg-card px-4 py-3 text-muted-foreground">
                   Sherpa está preparando uma resposta...
                 </div>
               </div>
@@ -170,7 +170,7 @@ export default function AgentWorkspacePage() {
           </div>
         </ScrollArea>
 
-        <div className="p-4 border-t border-zinc-800/80 bg-zinc-950">
+        <div className="border-t border-border bg-background p-4">
           <form onSubmit={handleSendMessage} className="max-w-2xl mx-auto flex gap-2">
             <textarea
               rows={2}
@@ -178,10 +178,10 @@ export default function AgentWorkspacePage() {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Envie uma dúvida ou instrução para seu especialista..."
               disabled={isPending}
-              className="min-h-10 flex-1 resize-y rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-zinc-700 disabled:opacity-50"
+              className="min-h-10 flex-1 resize-y rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
             />
-            <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()} className="bg-zinc-100 text-zinc-900 hover:bg-zinc-300 shrink-0">
-              <Send className="h-4 w-4" />
+            <Button type="submit" size="icon" disabled={isPending || !inputValue.trim()} className="shrink-0 rounded-full">
+              <Send className="size-4" />
             </Button>
           </form>
         </div>

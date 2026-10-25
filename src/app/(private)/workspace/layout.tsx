@@ -1,99 +1,46 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { signOut } from './actions'
-import { Button } from '@/components/ui/button'
-import { Sparkles, Bot, LogOut, LayoutDashboard } from 'lucide-react'
 import Link from 'next/link'
+import { LibraryBig, LogOut, Sparkles } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { WorkspaceNav } from '@/components/missions/WorkspaceNav'
+import { signOut } from './actions'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
-export default async function WorkspaceLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  if (!user) redirect('/login')
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-zinc-950 text-zinc-100 antialiased">
-      {/* Sidebar de Agentes */}
-      <aside className="flex w-64 flex-col justify-between border-r border-zinc-800 bg-zinc-900/50 p-4">
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 px-2">
-            <Sparkles className="h-5 w-5 text-white" />
-            <span className="text-sm font-bold tracking-wide uppercase">
-              Workspace IA
-            </span>
-          </div>
+    <div className="flex h-dvh w-full overflow-hidden bg-background text-foreground antialiased">
+      <aside className="flex w-[68px] shrink-0 flex-col items-center border-r border-border bg-card py-4">
+        <Link href="/workspace" aria-label="Workspace IA — início" title="Workspace IA" className="mb-7 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition hover:bg-primary/15">
+          <Sparkles className="size-5" />
+        </Link>
 
-          <nav className="space-y-1">
-            <Link href="/workspace">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-zinc-300 hover:bg-zinc-800 hover:text-white"
-              >
-                <LayoutDashboard className="h-4 w-4" />
-                Dashboard
-              </Button>
-            </Link>
-            <div className="px-2 pt-4 pb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-              Especialistas
-            </div>
-            <Link href="/workspace/vsl-writer">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                <Bot className="h-4 w-4" />
-                Copywriter VSL
-              </Button>
-            </Link>
-            <Link href="/workspace/funnel-architect">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                <Bot className="h-4 w-4" />
-                Arquiteto de Funil
-              </Button>
-            </Link>
-            <Link href="/workspace/traffic-analyst">
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                <Bot className="h-4 w-4" />
-                Gestor de Tráfego
-              </Button>
-            </Link>
-          </nav>
-        </div>
+        <WorkspaceNav />
+        <Separator className="my-5 w-9" />
+        <Button render={<Link href="/workspace" />} variant="ghost" size="icon" aria-label="Playbooks" title="Playbooks" className="size-11 rounded-xl text-muted-foreground">
+          <LibraryBig data-icon="inline-start" />
+        </Button>
 
-        {/* Rodapé do Usuário */}
-        <div className="space-y-3 border-t border-zinc-800 pt-4">
-          <div className="truncate px-2 text-xs text-zinc-400">
-            {user.email}
-          </div>
+        <div className="mt-auto flex flex-col items-center gap-3">
+          <ThemeToggle />
+          <span title={user.email ?? 'Conta'} className="flex size-9 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-semibold text-primary">
+            {(user.email?.[0] ?? 'U').toUpperCase()}
+          </span>
           <form action={signOut}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start gap-2 border-zinc-800 text-zinc-300 hover:bg-zinc-800"
-            >
-              <LogOut className="h-4 w-4" />
-              Sair
+            <Button type="submit" variant="ghost" size="icon" aria-label="Sair" title="Sair" className="size-9 rounded-xl text-muted-foreground">
+              <LogOut data-icon="inline-start" />
             </Button>
           </form>
         </div>
       </aside>
 
-      {/* Main Stage */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
     </div>
   )
 }
