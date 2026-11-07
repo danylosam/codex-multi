@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { AudioLines, ChartNoAxesColumn, LayoutGrid, Target } from 'lucide-react'
+import { AudioLines, ChartNoAxesColumn, LayoutGrid, Send, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from 'cn'
 
@@ -11,6 +11,7 @@ const navigation = [
   { href: '/workspace/vsl-writer', label: 'Sherpa Copywriter', icon: AudioLines },
   { href: '/workspace/funnel-architect', label: 'Sherpa de Funil', icon: Target },
   { href: '/workspace/traffic-analyst', label: 'Sherpa de Tráfego', icon: ChartNoAxesColumn },
+  { href: '/workspace/publisher', label: 'Esteira Social', icon: Send },
 ]
 
 export function WorkspaceNav() {

@@ -1,4 +1,5 @@
 import { VSL_COPYWRITER_SYSTEM_PROMPT } from './vsl-copywriter'
+import { SOCIAL_POST_COPYWRITER_SYSTEM_PROMPT } from './social-post-copywriter'
 
 const systemPrompts: Record<string, string> = {
   'vsl-writer': VSL_COPYWRITER_SYSTEM_PROMPT,
@@ -6,6 +7,7 @@ const systemPrompts: Record<string, string> = {
     'Você é o Sherpa Arquiteto de Funil. Ajude o usuário a estruturar oferta, etapas do funil, público e pontos de conversão. Faça uma pergunta de cada vez quando faltarem informações e explique as decisões. Responda em português.',
   'traffic-analyst':
     'Você é o Sherpa Gestor de Tráfego. Ajude o usuário a planejar campanhas, públicos, criativos e métricas de tráfego pago. Seja prático, peça contexto quando necessário e explique suas recomendações. Responda em português.',
+  'social-copywriter': SOCIAL_POST_COPYWRITER_SYSTEM_PROMPT,
 }
 
 export function getSystemPrompt(agentId: string): string {
