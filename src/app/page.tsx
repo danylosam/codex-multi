@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight,
   ArrowUpRight,
@@ -106,36 +107,42 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="mx-auto grid min-h-[650px] max-w-[1320px] content-between gap-14 px-5 pb-14 pt-16 sm:px-8 sm:pb-16 sm:pt-20 lg:min-h-[690px] lg:px-12 lg:pt-24">
-        <div>
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3.5 py-2 text-[13px] text-muted-foreground backdrop-blur-md">
-            <span className="size-1.5 rounded-full bg-foreground" />
+      <section className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-8 px-5 pb-16 pt-12 sm:px-8 sm:pb-20 sm:pt-16 lg:grid-cols-2 lg:gap-8 lg:px-12 lg:py-16 xl:gap-12">
+        <div className="relative z-10 max-w-[620px]">
+          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-primary/20 bg-primary/[0.06] px-4 py-2.5 text-[13px] font-medium text-foreground/85 shadow-[0_0_28px_color-mix(in_srgb,var(--primary)_12%,transparent)] backdrop-blur-md">
+            <span className="size-1.5 rounded-full bg-primary shadow-[0_0_10px_currentColor]" aria-hidden="true" />
             A Nova Era do Aprendizado por Execução
           </div>
-          <h1 className="max-w-[14ch] text-[clamp(3.5rem,10vw,9rem)] leading-[0.9] font-semibold tracking-[-0.075em] text-foreground [text-wrap:balance]">
-            Não assista a cursos.
+          <h1 className="max-w-[20ch] text-[clamp(2.125rem,4.6vw,4rem)] leading-[1.04] font-semibold tracking-[-0.055em] text-foreground [text-wrap:balance]">
+            <span className="block">Não assista a cursos.</span>
+            <span className="block">Construa seus ativos.</span>
           </h1>
-        </div>
-
-        <div className="grid items-end gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
-          <div className="max-w-[690px]">
-            <p className="text-xl leading-[1.35] tracking-tight text-foreground sm:text-2xl">
-              Construa ativos de alta conversão ao lado de Sherpas especialistas.
-            </p>
-            <p className="mt-4 max-w-[600px] text-base leading-7 text-muted-foreground sm:text-lg">
-              Em poucos minutos de alinhamento prático, sua VSL, oferta e criativos saem prontos para o campo de batalha.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 md:justify-end">
-            <Link href={workspaceHref} className="inline-flex h-12 items-center gap-3 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5">
+          <p className="mt-6 max-w-[58ch] text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+            Delegue o trabalho pesado. Seus Sherpas criam as copys, imagens e vídeos. Você apenas aprova e o sistema posta no seu Instagram automaticamente.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href={workspaceHref} className="group inline-flex h-12 items-center gap-3 rounded-full border border-foreground/10 bg-gradient-to-r from-primary to-primary/80 px-5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/15 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
               Iniciar Primeira Missão
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <a href="#missoes" className="inline-flex h-12 items-center gap-2 rounded-full border border-border px-5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
-              Conhecer os Sherpas
+            <a href="#diferenciais" className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-background/40 px-5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+              Conhecer a Esteira
             </a>
           </div>
         </div>
+
+        <figure className="relative mx-auto mt-1 w-full max-w-xl lg:mt-0 lg:ml-auto xl:max-w-2xl">
+          <Image
+            src="/assets/hero-glow-3d.png"
+            alt="Rede luminosa de serviços de inteligência artificial conectados ao símbolo WS"
+            width={1792}
+            height={1024}
+            sizes="(max-width: 1023px) 100vw, (max-width: 1535px) 48vw, 640px"
+            loading="eager"
+            fetchPriority="high"
+            className="h-auto w-full rounded-2xl object-contain mix-blend-screen"
+          />
+        </figure>
       </section>
 
       <section id="missoes" className="bg-card py-16 sm:py-20 lg:py-24">
