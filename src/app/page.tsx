@@ -62,7 +62,7 @@ export default function Home() {
                 <p className="text-lg text-zinc-200 max-w-lg leading-relaxed">
                   Alinhe o contexto do seu negócio com agentes autônomos de alta performance. Em minutos de interação guiada, suas ofertas, roteiros e criativos saem estruturados e prontos para distribuição.
                 </p>
-                
+                              
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   <Link 
                     href="/workspace" 
