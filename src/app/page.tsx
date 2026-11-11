@@ -140,7 +140,7 @@ export default async function Home() {
             sizes="(max-width: 1023px) 100vw, (max-width: 1535px) 48vw, 640px"
             loading="eager"
             fetchPriority="high"
-            className="h-auto w-full rounded-2xl object-contain mix-blend-screen"
+            className="h-auto w-full rounded-2xl object-contain dark:mix-blend-screen"
           />
         </figure>
       </section>
