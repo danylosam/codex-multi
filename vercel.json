@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/social-publisher",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
