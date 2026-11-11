@@ -52,12 +52,12 @@ export default function Home() {
                 </div>
                 
                 <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
-                  Não assista <br />a cursos. <br />
-                  <span className="text-zinc-400">Construa seus ativos.</span>
+                  Aprender é <br />construir. <br />
+                  <span className="text-zinc-400">Da ideia ao ativo publicado em um único fluxo.</span>
                 </h1>
                 
                 <p className="text-lg text-zinc-400 max-w-lg leading-relaxed">
-                  Construa ativos de alta conversão ao lado de Sherpas especialistas. Em poucos minutos de alinhamento prático, sua VSL, oferta e criativos saem prontos para o campo de batalha.
+                  Alinhe o contexto do seu negócio com agentes autônomos de alta performance. Em minutos de interação guiada, suas ofertas, roteiros e criativos saem estruturados e prontos para distribuição.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
