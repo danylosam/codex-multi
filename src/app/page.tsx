@@ -15,7 +15,6 @@ import {
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-indigo-500/30">
-      {/* HEADER: Glassmorphism */}
       <header className="sticky top-0 z-50 w-full border-b border-zinc-800/50 bg-zinc-950/70 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg">
@@ -40,14 +39,11 @@ export default function Home() {
       </header>
 
       <main>
-        {/* HERO SECTION: Split-Screen com Imagem 3D */}
         <section className="relative overflow-hidden pt-16 pb-24 border-b border-zinc-800/40">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/15 blur-[130px] rounded-full pointer-events-none" />
           
           <div className="container mx-auto px-6 relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              
-              {/* LADO ESQUERDO: Copy e CTA */}
               <div className="flex flex-col items-start space-y-6">
                 <div className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-4 py-1.5 text-sm text-zinc-300 backdrop-blur-sm">
                   <span className="flex h-2 w-2 rounded-full bg-indigo-500 mr-3 animate-pulse"></span>
@@ -79,7 +75,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* LADO DIREITO: Imagem 3D */}
               <div className="relative w-full aspect-[4/3] lg:aspect-[16/10] rounded-2xl overflow-hidden border border-zinc-800/60 shadow-2xl group">
                 <Image
                   src="/assets/hero-glow-3d.png"
@@ -89,12 +84,10 @@ export default function Home() {
                   priority
                 />
               </div>
-
             </div>
           </div>
         </section>
 
-        {/* SEÇÃO: Missões em destaque */}
         <section id="missoes" className="py-20 border-b border-zinc-800/40">
           <div className="container mx-auto px-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
@@ -108,7 +101,6 @@ export default function Home() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Card 1 */}
               <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-zinc-700 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -126,7 +118,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Card 2 */}
               <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-zinc-700 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -144,7 +135,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Card 3 */}
               <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-zinc-700 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -162,7 +152,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Card 4 */}
               <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-zinc-700 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -183,7 +172,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SEÇÃO: Pilares de Execução */}
         <section id="visao" className="py-24">
           <div className="container mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-16 items-start">
