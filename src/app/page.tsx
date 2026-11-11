@@ -53,10 +53,10 @@ export default function Home() {
                 
                 <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
                   Aprender é <br />construir. <br />
-                  <span className="text-zinc-400">Da ideia ao ativo publicado em um único fluxo.</span>
+                  <span className="text-zinc-450">Da ideia ao ativo publicado em um único fluxo.</span>
                 </h1>
                 
-                <p className="text-lg text-zinc-400 max-w-lg leading-relaxed">
+                <p className="text-lg text-zinc-200 max-w-lg leading-relaxed">
                   Alinhe o contexto do seu negócio com agentes autônomos de alta performance. Em minutos de interação guiada, suas ofertas, roteiros e criativos saem estruturados e prontos para distribuição.
                 </p>
                 
