@@ -54,11 +54,15 @@ export default function Home() {
                   A Nova Era do Aprendizado por Execução
                 </div>
                 
-                <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
-                  Aprender é <br />construir. <br />
-                  <span className="text-zinc-500">Da ideia ao ativo publicado em um único fluxo.</span>
+                <h1 className="tracking-tight text-white">
+                  <span className="block text-6xl lg:text-8xl font-extrabold leading-[1.02]">
+                  Aprender é <br />construir.
+                  </span>
+                  <span className="block text-3xl lg:text-5xl font-medium text-zinc-400 leading-[1.15] mt-3">
+                  Da ideia ao ativo publicado em um único fluxo.
+                  </span>
                 </h1>
-                
+                               
                 <p className="text-lg text-zinc-200 max-w-lg leading-relaxed">
                   Alinhe o contexto do seu negócio com agentes autônomos de alta performance. Em minutos de interação guiada, suas ofertas, roteiros e criativos saem estruturados e prontos para distribuição.
                 </p>
