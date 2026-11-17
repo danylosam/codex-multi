@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CalendarClock, ImagePlus, LoaderCircle, Sparkles } from 'lucide-react'
+import { CalendarClock, LoaderCircle, Sparkles } from 'lucide-react'
 
 export function PostScheduleModal({ open, onOpenChange, intent }: { open: boolean; onOpenChange: (open: boolean) => void; intent: 'create' | 'schedule' }) {
   const [pending, setPending] = useState(false)
@@ -27,7 +27,7 @@ export function PostScheduleModal({ open, onOpenChange, intent }: { open: boolea
       toast.error('Não foi possível criar o post', { description: result.error })
       return
     }
-    toast.success('Post adicionado à esteira')
+    toast.success('Post adicionado à esteira do Make')
     onOpenChange(false)
   }
 
@@ -54,7 +54,7 @@ export function PostScheduleModal({ open, onOpenChange, intent }: { open: boolea
         <DialogHeader className="pr-8">
           <div className="mb-1 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Sparkles className="size-5" /></div>
           <DialogTitle className="text-xl">{intent === 'schedule' ? 'Agendar publicação' : 'Preparar publicação'}</DialogTitle>
-          <DialogDescription>Adicione o criativo e a legenda. A imagem será armazenada temporariamente até a publicação.</DialogDescription>
+          <DialogDescription>Descreva o briefing visual para a IA criar a arte automaticamente no Make ou envie uma imagem própria.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -67,19 +67,18 @@ export function PostScheduleModal({ open, onOpenChange, intent }: { open: boolea
               <input type="hidden" name="platform" value={platform} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="scheduled_at">Agendar para {intent === 'create' && <span className="font-normal text-muted-foreground">(opcional)</span>}</Label>
+              <Label htmlFor="scheduled_at">Agendar para {intent === 'create' && <span className="font-normal text-muted-foreground">(vazio = imediato)</span>}</Label>
               <Input id="scheduled_at" name="scheduled_at" type="datetime-local" required={intent === 'schedule'} min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)} />
               {intent === 'schedule' && <input type="hidden" name="schedule_required" value="true" />}
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="image">Imagem do post</Label>
-              <Input id="image" name="image" type="file" accept={platform === 'instagram' ? 'image/jpeg' : 'image/jpeg,image/png,image/webp'} required className="h-11 file:mr-3" />
-            <p className="text-xs text-muted-foreground">{platform === 'instagram' ? 'JPEG' : 'JPG, PNG ou WebP'} · até 10 MB. O arquivo fica público enquanto aguarda a publicação.</p>
+            <Label htmlFor="prompt_image">Prompt Visual para IA <span className="font-normal text-muted-foreground">(usado pelo Make para gerar a arte)</span></Label>
+            <Input id="prompt_image" name="prompt_image" placeholder="Ex.: Minimalist 3D futuristic dark glass command center, ultra clean SaaS aesthetic, 4k" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="prompt_image">Briefing visual para o Sherpa <span className="font-normal text-muted-foreground">(opcional)</span></Label>
-            <Input id="prompt_image" name="prompt_image" placeholder="Ex.: criativo editorial para lançamento de produto" />
+            <Label htmlFor="image">Ou envie uma imagem própria <span className="font-normal text-muted-foreground">(opcional)</span></Label>
+            <Input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" className="h-11 file:mr-3" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="briefing">Contexto da publicação</Label>
