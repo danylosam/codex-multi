@@ -1,5 +1,7 @@
 'use server'
 
+import { generateQueueForRule, type AutopilotRule } from '@/lib/social/autopilot'
+
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { generateSherpaReply } from '@/lib/ai/sherpa-service'
@@ -120,6 +122,82 @@ export async function deleteSocialPost(postId: string) {
     .delete()
     .eq('id', postId)
     .or(`user_id.eq.${user.id},user_id.is.null`)
+  if (error) return { error: error.message }
+  revalidatePath('/workspace/publisher')
+  return { success: true }
+}
+export async function createAutopilotRule(formData: FormData) {
+  const { supabase, user } = await getUser()
+  const platform = String(formData.get('platform') ?? 'instagram')
+  const theme = String(formData.get('theme') ?? '').trim()
+  const visualStyle = String(formData.get('visual_style') ?? '').trim()
+  const startHour = Number(formData.get('start_hour') ?? 6)
+  const endHour = Number(formData.get('end_hour') ?? 12)
+  const intervalHours = Number(formData.get('interval_hours') ?? 1)
+
+  if (theme.length < 5) return { error: 'Descreva um tema com pelo menos 5 caracteres.' }
+  if (endHour < startHour) return { error: 'A hora final deve ser maior ou igual à hora inicial.' }
+
+  const { data: rule, error } = await supabase
+    .from('social_autopilot_rules')
+    .insert({
+      user_id: user.id,
+      platform,
+      theme,
+      visual_style: visualStyle || null,
+      start_hour: startHour,
+      end_hour: endHour,
+      interval_hours: intervalHours,
+      is_active: true,
+    })
+    .select('*')
+    .single()
+
+  if (error || !rule) return { error: error?.message ?? 'Erro ao salvar regra do Piloto Automático.' }
+
+  try {
+    const todayRes = await generateQueueForRule(supabase, rule as AutopilotRule, {
+      targetOffsetDays: 0,
+      onlyFutureHoursToday: true,
+    })
+    // Se já passou do horário de hoje, já abastece os horários de amanhã imediatamente
+    if (todayRes.created === 0) {
+      await generateQueueForRule(
+        supabase,
+        { ...(rule as AutopilotRule), last_generated_date: todayRes.dateStr },
+        { targetOffsetDays: 1, onlyFutureHoursToday: false }
+      )
+    }
+  } catch (err) {
+    revalidatePath('/workspace/publisher')
+    return {
+      error: `Regra salva, mas houve falha ao gerar o primeiro lote com IA: ${err instanceof Error ? err.message : 'Erro'}`,
+    }
+  }
+
+  revalidatePath('/workspace/publisher')
+  return { success: true }
+}
+
+export async function toggleAutopilotRule(ruleId: string, isActive: boolean) {
+  const { supabase, user } = await getUser()
+  const { error } = await supabase
+    .from('social_autopilot_rules')
+    .update({ is_active: isActive })
+    .eq('id', ruleId)
+    .eq('user_id', user.id)
+  if (error) return { error: error.message }
+  revalidatePath('/workspace/publisher')
+  return { success: true }
+}
+
+export async function deleteAutopilotRule(ruleId: string) {
+  const { supabase, user } = await getUser()
+  const { error } = await supabase
+    .from('social_autopilot_rules')
+    .delete()
+    .eq('id', ruleId)
+    .eq('user_id', user.id)
   if (error) return { error: error.message }
   revalidatePath('/workspace/publisher')
   return { success: true }
